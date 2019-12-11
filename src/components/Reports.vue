@@ -1,4 +1,5 @@
 <template>
+
   <div id="Reports" class="container">
     <nav class="level is-mobile">
       <div class="level-item has-text-centered">
@@ -26,7 +27,7 @@
         </div>
       </div>
     </nav>
-  </div>
+    </div>
 </template>
 
 <script>
