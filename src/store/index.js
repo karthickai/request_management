@@ -7,20 +7,31 @@ Vue.use(JsonViewer)
 
 export default new Vuex.Store({
   state: {
-    component: "Status"
+    component: "Status",
+    data: "",
+    sensor: ""
 
   },
   mutations: {
     change(state, component) {
       state.component = component
+    },
+    save(state, data) {
+      state.data = data
+    },
+    sensor(state, sensor) {
+      state.sensor = sensor
     }
   },
   getters: {
-    component: state => state.component
-
+    component: state => state.component,
+    data: state => state.data,
+    sensor: state => state.sensor
   },
   actions: {
   },
   modules: {
   }
 })
+
+

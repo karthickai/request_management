@@ -32,9 +32,11 @@
         <template slot-scope="props">
           <b-table-column field="id" label="ID" width="40" numeric>{{ props.row.id }}</b-table-column>
 
-          <b-table-column field="name" label="Request Name">{{ props.row.name }}</b-table-column>
+          <b-table-column field="companyName" label="Company Name">{{ props.row.companyName }}</b-table-column>
 
-          <b-table-column field="companyId" label="Comapny ID">{{ props.row.companyId }}</b-table-column>
+          <b-table-column field="requestID" label="Request ID">
+            <strong>{{ props.row.requestID }}</strong>
+          </b-table-column>
 
           <b-table-column field="date" label="Date" centered>
             <span class="tag is-info">{{ new Date(props.row.date).toLocaleDateString() }}</span>
@@ -67,6 +69,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import StatusView from "@/components/StatusView.vue";
 
 export default {
@@ -78,18 +81,8 @@ export default {
     StatusView
   },
   data() {
-    const data = [
-      {
-        id: 1,
-        name: "Request01",
-        companyId: "34v345v3453sdfsg456",
-        date: "2016/10/15 13:43:27",
-        status: "Approved"
-      }
-    ];
-
     return {
-      data,
+      data: [],
       isEmpty: false,
       isBordered: false,
       isStriped: false,
@@ -108,7 +101,55 @@ export default {
         cancelText: "Cancel",
         confirmText: "Send",
         type: "is-success",
-        onConfirm: () => this.$buefy.toast.open("Request sent")
+        onConfirm: () => {
+          this.$buefy.toast.open("Request sent");
+          axios
+            .get("http://127.0.0.1:5000/request", {
+              auth: {
+                username: "ibmiot",
+                password: "ibmadmin"
+              },
+              headers:{
+                'Content-Type': 'application/json'
+              }
+            })
+            .then(response => {
+              /* eslint-disable no-console */
+              console.log(response.data);
+              /* eslint-enable no-console */
+              this.$store.commit("sensor", response.data.sensor);
+              this.data.push({
+                companyName: "IBM IoT",
+                date: new Date().toLocaleString(),
+                id: response.data.countID,
+                requestID: response.data.requestID,
+                status: response.data.message
+              });
+              axios
+                .get("http://localhost:5000/company", {
+                  auth: {
+                    username: "ibmiot",
+                    password: "ibmadmin"
+                  }
+                })
+                .then(response => {
+                  /* eslint-disable no-console */
+                  console.log(response);
+                  /* eslint-enable no-console */
+                  this.$store.commit("save", response.data);
+                })
+                .catch(error => {
+                  /* eslint-disable no-console */
+                  console.log(error);
+                  /* eslint-enable no-console */
+                });
+            })
+            .catch(error => {
+              /* eslint-disable no-console */
+              console.log(error);
+              /* eslint-enable no-console */
+            });
+        }
       });
     }
   }
